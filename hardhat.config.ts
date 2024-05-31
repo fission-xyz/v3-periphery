@@ -1,8 +1,18 @@
-import '@nomiclabs/hardhat-ethers'
-import '@nomiclabs/hardhat-etherscan'
+import '@typechain/hardhat'
+
 import '@nomiclabs/hardhat-waffle'
-import 'hardhat-typechain'
+import '@nomiclabs/hardhat-ethers'
+
+import '@solarity/hardhat-migrate'
+
 import 'hardhat-watcher'
+
+import { HardhatUserConfig } from 'hardhat/config'
+
+import * as dotenv from 'dotenv'
+dotenv.config()
+
+const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : undefined
 
 const LOW_OPTIMIZER_COMPILER_SETTINGS = {
   version: '0.7.6',
@@ -46,7 +56,7 @@ const DEFAULT_COMPILER_SETTINGS = {
   },
 }
 
-export default {
+const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       allowUnlimitedContractSize: false,
@@ -101,4 +111,12 @@ export default {
       verbose: true,
     },
   },
+  typechain: {
+    outDir: 'typechain',
+    target: 'ethers-v5',
+    alwaysGenerateOverloads: true,
+    discriminateTypes: true,
+  },
 }
+
+export default config
