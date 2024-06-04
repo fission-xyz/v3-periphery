@@ -47,7 +47,7 @@ describe('PositionValue', async () => {
       nft,
       router,
       factory,
-    }
+    } as any
   }
 
   let pool: Contract

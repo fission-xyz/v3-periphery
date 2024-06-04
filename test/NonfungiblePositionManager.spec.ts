@@ -51,7 +51,7 @@ describe('NonfungiblePositionManager', () => {
       tokens,
       weth9,
       router,
-    }
+    } as any
   }
 
   let factory: IUniswapV3Factory
@@ -294,7 +294,7 @@ describe('NonfungiblePositionManager', () => {
       })
       const receipt = await tx.wait()
       const balanceAfter = await wallet.getBalance()
-      expect(balanceBefore).to.eq(balanceAfter.add(receipt.gasUsed.mul(tx.gasPrice)).add(100))
+      expect(balanceBefore).to.eq(balanceAfter.add(receipt.gasUsed.mul(tx.gasPrice!)).add(100))
     })
 
     it('emits an event')
@@ -938,36 +938,36 @@ describe('NonfungiblePositionManager', () => {
       })
 
       it('changes the operator of the position and increments the nonce', async () => {
-        const { v, r, s } = await getPermitNFTSignature(other, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(other, nft as any, wallet.address, tokenId, 1)
         await nft.permit(wallet.address, tokenId, 1, v, r, s)
         expect((await nft.positions(tokenId)).nonce).to.eq(1)
         expect((await nft.positions(tokenId)).operator).to.eq(wallet.address)
       })
 
       it('cannot be called twice with the same signature', async () => {
-        const { v, r, s } = await getPermitNFTSignature(other, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(other, nft as any, wallet.address, tokenId, 1)
         await nft.permit(wallet.address, tokenId, 1, v, r, s)
         await expect(nft.permit(wallet.address, tokenId, 1, v, r, s)).to.be.reverted
       })
 
       it('fails with invalid signature', async () => {
-        const { v, r, s } = await getPermitNFTSignature(wallet, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(wallet, nft as any, wallet.address, tokenId, 1)
         await expect(nft.permit(wallet.address, tokenId, 1, v + 3, r, s)).to.be.revertedWith('Invalid signature')
       })
 
       it('fails with signature not from owner', async () => {
-        const { v, r, s } = await getPermitNFTSignature(wallet, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(wallet, nft as any, wallet.address, tokenId, 1)
         await expect(nft.permit(wallet.address, tokenId, 1, v, r, s)).to.be.revertedWith('Unauthorized')
       })
 
       it('fails with expired signature', async () => {
         await nft.setTime(2)
-        const { v, r, s } = await getPermitNFTSignature(other, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(other, nft as any, wallet.address, tokenId, 1)
         await expect(nft.permit(wallet.address, tokenId, 1, v, r, s)).to.be.revertedWith('Permit expired')
       })
 
       it('gas', async () => {
-        const { v, r, s } = await getPermitNFTSignature(other, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(other, nft as any, wallet.address, tokenId, 1)
         await snapshotGasCost(nft.permit(wallet.address, tokenId, 1, v, r, s))
       })
     })
@@ -1003,7 +1003,7 @@ describe('NonfungiblePositionManager', () => {
       })
 
       it('changes the operator of the position and increments the nonce', async () => {
-        const { v, r, s } = await getPermitNFTSignature(other, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(other, nft as any, wallet.address, tokenId, 1)
         await testPositionNFTOwner.setOwner(other.address)
         await nft.permit(wallet.address, tokenId, 1, v, r, s)
         expect((await nft.positions(tokenId)).nonce).to.eq(1)
@@ -1011,26 +1011,26 @@ describe('NonfungiblePositionManager', () => {
       })
 
       it('fails if owner contract is owned by different address', async () => {
-        const { v, r, s } = await getPermitNFTSignature(other, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(other, nft as any, wallet.address, tokenId, 1)
         await testPositionNFTOwner.setOwner(wallet.address)
         await expect(nft.permit(wallet.address, tokenId, 1, v, r, s)).to.be.revertedWith('Unauthorized')
       })
 
       it('fails with signature not from owner', async () => {
-        const { v, r, s } = await getPermitNFTSignature(wallet, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(wallet, nft as any, wallet.address, tokenId, 1)
         await testPositionNFTOwner.setOwner(other.address)
         await expect(nft.permit(wallet.address, tokenId, 1, v, r, s)).to.be.revertedWith('Unauthorized')
       })
 
       it('fails with expired signature', async () => {
         await nft.setTime(2)
-        const { v, r, s } = await getPermitNFTSignature(other, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(other, nft as any, wallet.address, tokenId, 1)
         await testPositionNFTOwner.setOwner(other.address)
         await expect(nft.permit(wallet.address, tokenId, 1, v, r, s)).to.be.revertedWith('Permit expired')
       })
 
       it('gas', async () => {
-        const { v, r, s } = await getPermitNFTSignature(other, nft, wallet.address, tokenId, 1)
+        const { v, r, s } = await getPermitNFTSignature(other, nft as any, wallet.address, tokenId, 1)
         await testPositionNFTOwner.setOwner(other.address)
         await snapshotGasCost(nft.permit(wallet.address, tokenId, 1, v, r, s))
       })
