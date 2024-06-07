@@ -60,11 +60,6 @@ After the `.env` file is created, you can run the deployment script for the netw
 yarn hardhat migrate --network sepolia --verify
 ```
 
-## Bug bounty
-
-This repository is subject to the Uniswap V3 bug bounty program,
-per the terms defined [here](./bug-bounty.md).
-
 ## Local deployment
 
 In order to deploy this code to a local testnet, you should install the npm package
