@@ -15,7 +15,7 @@ In order to run tests, first of all you need to install dependencies:
 yarn install
 ```
 
-If you do not have `yarn` installed, you can install it by running, please refer to the [yarn documentation](https://classic.yarnpkg.com/en/docs/install):
+If you do not have `yarn` installed, you can install it by running, please refer to the [yarn documentation](https://classic.yarnpkg.com/en/docs/install).
 
 Then you can run tests:
 
