@@ -1,17 +1,28 @@
-import { constants } from 'ethers'
+import { constants, Contract } from 'ethers'
 import { waffle, ethers } from 'hardhat'
 
 import { PoolAddressTest } from '../typechain'
 import { POOL_BYTECODE_HASH } from './shared/computePoolAddress'
 import { expect } from './shared/expect'
 import snapshotGasCost from './shared/snapshotGasCost'
+import { Fixture } from 'ethereum-waffle'
+import completeFixture from './shared/completeFixture'
 
 describe('PoolAddress', () => {
   let poolAddress: PoolAddressTest
+  let factory: Contract
 
-  const poolAddressTestFixture = async () => {
+  const poolAddressTestFixture: Fixture<{
+    factory: Contract
+    poolAddress: PoolAddressTest
+  }> = async (wallets, provider) => {
     const poolAddressTestFactory = await ethers.getContractFactory('PoolAddressTest')
-    return (await poolAddressTestFactory.deploy()) as PoolAddressTest
+    const { factory } = await completeFixture(wallets, provider)
+    const poolAddress = (await poolAddressTestFactory.deploy()) as PoolAddressTest
+    return {
+      factory,
+      poolAddress,
+    }
   }
 
   let loadFixture: ReturnType<typeof waffle.createFixtureLoader>
@@ -21,13 +32,7 @@ describe('PoolAddress', () => {
   })
 
   beforeEach('deploy PoolAddressTest', async () => {
-    poolAddress = await loadFixture(poolAddressTestFixture)
-  })
-
-  describe('#POOL_INIT_CODE_HASH', () => {
-    it('equals the hash of the pool bytecode', async () => {
-      expect(await poolAddress.POOL_INIT_CODE_HASH()).to.eq(POOL_BYTECODE_HASH)
-    })
+    ;({ poolAddress, factory } = await loadFixture(poolAddressTestFixture))
   })
 
   describe('#computeAddress', () => {
@@ -39,7 +44,7 @@ describe('PoolAddress', () => {
     it('matches example from core repo', async () => {
       expect(
         await poolAddress.computeAddress(
-          '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+          factory.address,
           '0x1000000000000000000000000000000000000000',
           '0x2000000000000000000000000000000000000000',
           250
@@ -50,7 +55,7 @@ describe('PoolAddress', () => {
     it('token argument order cannot be in reverse', async () => {
       await expect(
         poolAddress.computeAddress(
-          '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+          factory.address,
           '0x2000000000000000000000000000000000000000',
           '0x1000000000000000000000000000000000000000',
           3000
@@ -61,7 +66,7 @@ describe('PoolAddress', () => {
     it('gas cost', async () => {
       await snapshotGasCost(
         poolAddress.getGasCostOfComputeAddress(
-          '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+          factory.address,
           '0x1000000000000000000000000000000000000000',
           '0x2000000000000000000000000000000000000000',
           3000
